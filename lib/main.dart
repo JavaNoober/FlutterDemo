@@ -25,7 +25,7 @@ class RandomWordsState extends State<RandomWords> {
 
   final Set<WordPair> selfWordList = new Set<WordPair>(); //当前存储的字典
 
-  final TextStyle wordStyle = TextStyle(fontSize: 18.0);
+  final TextStyle wordStyle = const TextStyle(fontSize: 18.0);
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +35,9 @@ class RandomWordsState extends State<RandomWords> {
     return new Scaffold(
       appBar: new AppBar(
         title: const Text("字典"),
+        actions: <Widget>[
+          new IconButton(icon: new Icon(Icons.list), onPressed: pushSave)
+        ],
       ),
       body: buildWordListView(),
     );
@@ -43,7 +46,7 @@ class RandomWordsState extends State<RandomWords> {
   //listview 列表
   Widget buildWordListView() {
     return new ListView.builder(
-      padding: EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(16.0),
       itemBuilder: (BuildContext _context, int i) {
         if (i.isOdd) {
           //是否是奇数
@@ -82,5 +85,53 @@ class RandomWordsState extends State<RandomWords> {
         });
       },
     );
+  }
+
+  void pushSave() {
+    Navigator.of(context).push(
+        new MaterialPageRoute(builder: (context){
+          final tiles = selfWordList.map((wordPair){
+            return new ListTile(
+              title: new Text(wordPair.asPascalCase,style: wordStyle),
+            );
+          });
+          final divid = ListTile.divideTiles(context : context, tiles: tiles)
+              .toList();
+
+          return new Scaffold(
+              appBar: new AppBar(title: new Text("存储的字典")),
+              body: new ListView(children: divid));
+        }));
+  }
+}
+
+class SavedWidget extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() => new SavedWidgetState();
+
+}
+
+class SavedWidgetState extends State<SavedWidget>{
+  final Set<WordPair> selfWordList = new Set<WordPair>();
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+  }
+
+  Widget wordsListView(){
+    return new ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemBuilder: (BuildContext context, int index){
+          if(index.isOdd){
+            return new Divider();
+          }
+
+          return listItem(selfWordList.elementAt(index ~/ 2));
+        });
+  }
+
+  Widget listItem(WordPair wordPair){
+    return new ListTile(title: new Text(wordPair.asPascalCase));
   }
 }
